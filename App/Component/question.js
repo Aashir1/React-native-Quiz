@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, View, TextInput, StatusBar, Image, TouchableOpacity, TouchableHighlight, ToastAndroid } from 'react-native';
+import { Platform, StyleSheet, View, TextInput, StatusBar, Image, TouchableOpacity, TouchableHighlight, ToastAndroid, Modal, BackHandler } from 'react-native';
 import { Container, Header, Content, Badge, Text, Form, Item, Input, Label, ListItem, CheckBox, Body, Button } from 'native-base';
 import firebase from 'react-native-firebase';
 import { connect } from 'react-redux';
@@ -8,6 +8,7 @@ import Ripple from 'react-native-material-ripple';
 import BackgroundTimer from 'react-native-background-timer';
 import { NavigationActions } from 'react-navigation';
 import QuizAction from '../store/action/quizAction';
+import AwesomeAlert from 'react-native-awesome-alerts';
 
 class Questions extends Component {
     constructor(props) {
@@ -25,12 +26,30 @@ class Questions extends Component {
             sec: 0,
             userAnswers: [],
             correctAnswers: [],
+            attemptCounter: 0,
+            showAlert: false
         }
         this.question = [];
         this.clearTimer = {};
     }
+
+
     static navigationOptions = {
-        header: null
+
+        headerLeft: null,
+        title: 'Welcome In Quiz',
+        headerStyle: {
+            backgroundColor: '#212121',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+            flex: 1,
+            alignSelf: 'center',
+            textAlign: 'center',
+            fontWeight: 'normal',
+            fontFamily: '33535gillsansmt',
+            // fontFamily: "Ionicons",
+        },
     };
 
     componentDidMount() {
@@ -48,6 +67,31 @@ class Questions extends Component {
             this.setState({ sec, min });
         },
             1000);
+
+        BackHandler.addEventListener('hardwareBackPress', function () {
+            // this.onMainScreen and this.goBack are just examples, you need to use your own implementation here
+            // Typically you would use the navigator here to go to the last state.
+
+            /* ############################################ this.setState not a function ############################## */
+
+            this.setState({ showAlert: true });
+            if (true) {
+                return true;
+            }
+            return false;
+        });
+    }
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', function () {
+            // this.onMainScreen and this.goBack are just examples, you need to use your own implementation here
+            // Typically you would use the navigator here to go to the last state.
+
+            if (true) {
+                console.log('back button pressed')
+                return true;
+            }
+            return false;
+        });
     }
     updateIndex = () => {
         let { userAnswers, correctAnswers, score } = this.state;
@@ -61,7 +105,7 @@ class Questions extends Component {
             BackgroundTimer.clearInterval(this.clearTimer);
             this.reset('Result');
 
-            this.props.result({score: this.state.score, time: `${min}:${    sec}`});
+            this.props.result({ score: this.state.score, time: `${min}${sec}`, attempt: this.state.attemptCounter });
 
         }
         // if (this.props.questions[this.state.index].ans === this.state.userSelect) {
@@ -93,14 +137,17 @@ class Questions extends Component {
     }
 
     toggle = (flag, userSelect) => {
+        let { attemptCounter } = this.state;
         let obj = {
             flag1: false,
             flag2: false,
             flag3: false,
             flag4: false,
-            userSelect
+            userSelect,
+            attemptCounter
         }
         obj[flag] = true;
+        obj.attemptCounter++;
         console.log(obj);
         this.setState(obj);//start from there
         // ToastAndroid.showWithGravityAndOffset(
@@ -132,15 +179,98 @@ class Questions extends Component {
                     ]
                 }));
     }
+
+    hideAlert = () => {
+        this.setState({ showAlert: false });
+    }
+    hideAlertWithAction = () => {
+        let obj = {
+            index: 1,
+            flag1: false,
+            flag2: false,
+            flag3: false,
+            flag4: false,
+            userSelect: '',
+            score: 0,
+            tick: false,
+            min: 0,
+            sec: 0,
+            userAnswers: [],
+            correctAnswers: [],
+            attemptCounter: 0,
+            showAlert: false
+        }
+        BackgroundTimer.clearInterval(this.clearTimer);
+        this.question = [];
+        this.clearTimer = {};
+        this.setState(obj);
+        this.props.navigation.goback();
+    }
+
     render() {
+        let { progressBar } = this.props;
+        console.log(progressBar)
         let { params } = this.props.navigation.state;
         let name = params ? params.name : null;
         let quesObj = this.props.questions[this.state.index];
         this.question = quesObj;
+        console.log(this.question);
+        if (this.state.showAlert) {
+            return (
+                <View style={styles.container}>
+                    <AwesomeAlert
+                        show={showAlert}
+                        showProgress={false}
+                        title="Quiz"
+                        message="Exit Quiz ?"
+                        closeOnTouchOutside={false}
+                        closeOnHardwareBackPress={true}
+                        showCancelButton={true}
+                        showConfirmButton={true}
+                        cancelText="No"
+                        confirmText="Yes"
+                        confirmButtonColor="#DD6B55"
+                        onCancelPressed={() => {
+                            this.hideAlert();
+                        }}
+                        onConfirmPressed={() => {
+                            this.hideAlertWithAction();
+                        }}
+                    />
+                </View>
+
+            )
+        }
         return (
             <View style={[styles.container]}>
                 <StatusBar
                     hidden={true} />
+                {
+                    this.state.showAlert ?
+                        <View style={styles.container}>
+                            <AwesomeAlert
+                                show={showAlert}
+                                showProgress={false}
+                                title="Quiz"
+                                message="Exit Quiz ?"
+                                closeOnTouchOutside={false}
+                                closeOnHardwareBackPress={true}
+                                showCancelButton={true}
+                                showConfirmButton={true}
+                                cancelText="No"
+                                confirmText="Yes"
+                                confirmButtonColor="#DD6B55"
+                                onCancelPressed={() => {
+                                    this.hideAlert();
+                                }}
+                                onConfirmPressed={() => {
+                                    this.hideAlertWithAction();
+                                }}
+                            />
+                        </View>
+                        :
+                        null
+                }
                 <View style={styles.screenWrapper}>
                     <View style={styles.heading}>
                         <View style={{ flex: 1.5 }}>
@@ -307,6 +437,7 @@ function mapStateToProps(state) {
     return {
         // loader: state.authReducer.progressBar,
         questions: state.quizReducer.questions,
+        progressBar: state.quizReducer.progressBar,
 
     }
 }

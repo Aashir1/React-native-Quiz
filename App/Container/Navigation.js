@@ -38,7 +38,10 @@ const AppOpening = StackNavigator({
     screen: Menu
   },
   Question:{
-    screen: Questions
+    screen: Questions,
+    navigationOptions:  {
+      headerLeft: null
+  }
   },
   Topic:{
     screen: Topics

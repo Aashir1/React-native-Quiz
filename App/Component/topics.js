@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, View, TextInput, Button, StatusBar, Image, TouchableOpacity, PixelRatio, FlatList } from 'react-native';
+import { Platform, StyleSheet, View, TextInput, Button, StatusBar, Image, TouchableOpacity, PixelRatio, FlatList, Modal, ToastAndroid, BackHandler } from 'react-native';
 import { Container, Header, Content, Badge, Text, Icon, Form, Item, Input, Label } from 'native-base';
 import firebase from 'react-native-firebase';
 import QuizAction from '../store/action/quizAction';
@@ -33,17 +33,24 @@ class Topics extends Component {
     loadQuestion = (name) => {
         let { navigate } = this.props.navigation;
         console.log(this.props.navigation)
-        this.props.loadQuestion(name, navigate);
     }
 
-    navigate = () => {
+    navigate = (name) => {
         let { navigate } = this.props.navigation;
-        navigate('Question', { name: 'physics' });
+        this.props.loadQuestion(name, navigate);
+        ToastAndroid.showWithGravityAndOffset(
+            `Loading...`,
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM,
+            25,
+            50
+        );
+        // navigate('Question', { name: 'physics' });
     }
 
     render() {
         return (
-            <View style={{ flex: 1 , backgroundColor: 'white'}}>
+            <View style={{ flex: 1, backgroundColor: 'white' }}>
                 <ElevatedView
                     elevation={3}
                     style={styles.stayElevated}
@@ -65,7 +72,7 @@ class Topics extends Component {
                             elevation={3}
                             style={styles.stayElevated}
                         >
-                            <Ripple rippleDuration={900} onPress={this.navigate} style={{flex: 1}} >
+                            <Ripple rippleDuration={900} onPress={() => this.navigate('physics')} style={{ flex: 1 }} >
                                 <View style={styles.buttonContainer}>
                                     <Text style={styles.heading}>{item.chapNo}</Text>
                                     <Text style={styles.heading}>{item.chapterName}</Text>
@@ -90,10 +97,14 @@ const styles = StyleSheet.create({
         padding: 10
     },
     stayElevated: {
-       
         margin: 5,
         backgroundColor: 'white',
-        borderRadius:3 ,
+        borderRadius: 3,
+    },
+    heading: {
+        fontWeight: 'normal',
+        fontFamily: '33535gillsansmt',
+        fontSize: 20,
     }
 });
 
@@ -105,7 +116,7 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
     return {
-        
+        loadQuestion: (name, navigator) => dispatch(QuizAction.loadQuestion(name, navigator))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Topics);

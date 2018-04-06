@@ -30,8 +30,8 @@ class Menu extends Component {
 
     loadQuestion = (name) =>{
         let { navigate } = this.props.navigation;
-        console.log(this.props.navigation)
-        this.props.loadQuestion(name, navigate);
+        // console.log(this.props.navigation)
+        // this.props.loadQuestion(name, navigate);
         navigate('Topic');
     }
 

@@ -12,7 +12,7 @@ export default class QuizAction{
                         dispatch(QuizAction.storeQuestion(data));
                     }
                 })
-                // navigate('Question', { name });
+                navigate('Question', { name });
             });
         }
     }

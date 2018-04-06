@@ -45,7 +45,7 @@ class Result extends Component {
                     <View>
                         <Text style={[styles.fontstyle]}>
                             Total Time
-                    </Text>
+                        </Text>
                         <Text style={[styles.fontstyle]}>
                             {result.time}
                         </Text>
@@ -54,26 +54,25 @@ class Result extends Component {
                         <View >
                             <Text style={[styles.fontstyle, { fontSize: 17 }]}>
                                 Correct
-                    </Text>
+                            </Text>
                             <Text style={[styles.fontstyle]}>
-                                2
-                    </Text>
+                                {result.score}
+                            </Text>
                         </View>
 
                         <View >
                             <Text style={[styles.fontstyle, { fontSize: 17 }]}>
                                 Attempted
-                    </Text>
-                            <Text style={[styles.fontstyle]}>
-                                {result.score}
                             </Text>
-
+                            <Text style={[styles.fontstyle]}>
+                                {result.attempt}
+                            </Text>
                         </View>
                     </View>
                     <View>
-                        <Button style={{ borderRadius: 5, backgroundColor: '#26c282', width: 150, justifyContent: 'center' }} onPress={this.showResult}><Text style={[styles.fontstyle, { fontSize: 17 }]}> EndTest </Text></Button>
-                        <Button style={{ borderRadius: 5, backgroundColor: '#26c282', width: 150, justifyContent: 'center' }} onPress={this.showResult}><Text style={[styles.fontstyle, { fontSize: 17 }]}> Re-Take </Text></Button>
-                        <Button style={{ borderRadius: 5, backgroundColor: '#26c282', width: 150, justifyContent: 'center' }} onPress={this.showResult}><Text style={[styles.fontstyle, { fontSize: 17 }]}> View Correct Answer </Text></Button>
+                        <Button style={[styles.btnStyle, { justifyContent: 'center' }]} onPress={this.showResult}><Text style={[styles.fontstyle, { fontSize: 17 }]}> EndTest </Text></Button>
+                        <Button style={[styles.btnStyle, { justifyContent: 'center' }]} onPress={this.showResult}><Text style={[styles.fontstyle, { fontSize: 17 }]}> Re-Take </Text></Button>
+                        <Button style={[styles.btnStyle, {height: 100,}]} onPress={this.showResult}><Text style={[styles.fontstyle, { fontSize: 17,  textAlign: 'center' }]}> View Correct Answer </Text></Button>
                     </View>
                 </View>
             </View>
@@ -99,6 +98,12 @@ const styles = StyleSheet.create({
         fontWeight: 'normal',
         fontFamily: '33535gillsansmt',
         fontSize: 35
+    },
+    btnStyle:{
+        borderRadius: 10,
+        backgroundColor: '#26c282',
+        width: 150,
+        marginTop: 10
     }
 });
 

@@ -11,15 +11,15 @@ function quizReducer(state = initialState, action) {
     switch (action.type) {
         case actionType.LOAD_QUESTION_REQUEST:
             console.log('login request');
-            return Object.assign({}, state, { progressBar: true });
+            return Object.assign({}, state, { progressBar: true , questions:[]});
 
         case actionType.STORE_QUESTION:
             console.log('data storing')
-            return Object.assign({}, state, {questions: [...state.questions, action.data]});
+            return Object.assign({}, state, {questions: [...state.questions, action.data], progressBar: false});
 
         case actionType.RESULT:
             console.log(action);
-            return Object.assign({}, state, {score: action.data.score, time: action.data.time});
+            return Object.assign({}, state, {score: action.data.score, time: action.data.time, attempt: action.data.attempt});
 
         default:
             return state;
