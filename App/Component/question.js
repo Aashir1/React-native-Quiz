@@ -30,7 +30,7 @@ class Questions extends Component {
             showAlert: false
         }
         this.question = [];
-        this.clearTimer = {};
+        const clearTimer = {};
     }
 
 
@@ -52,28 +52,14 @@ class Questions extends Component {
         },
     };
 
-    componentDidMount() {
-        let { sec, min } = this.state;
-
-        this.clearTimer = BackgroundTimer.runBackgroundTimer(() => {
-            //code that will be called every 3 seconds 
-            if (sec < 60) {
-                sec = sec + 1;
-            }
-            if (sec === 60) {
-                sec = 0;
-                min = min + 1
-            }
-            this.setState({ sec, min });
-        },
-            1000);
-
-        BackHandler.addEventListener('hardwareBackPress', function () {
+    backButtonFunction = () => {
+        BackHandler.addEventListener('hardwareBackPress', () => {
             // this.onMainScreen and this.goBack are just examples, you need to use your own implementation here
             // Typically you would use the navigator here to go to the last state.
 
             /* ############################################ this.setState not a function ############################## */
-
+            BackgroundTimer.clearInterval(clearTimer);
+            console.log('back button pressed');
             this.setState({ showAlert: true });
             if (true) {
                 return true;
@@ -81,8 +67,26 @@ class Questions extends Component {
             return false;
         });
     }
+
+    updataTimerSeconds = () => {
+        let { sec, min } = this.state;
+        if (sec < 60) {
+            sec = sec + 1;
+        }
+        if (sec === 60) {
+            sec = 0;
+            min = min + 1
+        }
+        console.log('time update');
+        this.setState({ sec, min });
+    }
+
+    componentDidMount() {
+        clearTimer = BackgroundTimer.setInterval(this.updataTimerSeconds, 1000);
+        this.backButtonFunction();
+    }
     componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', function () {
+        BackHandler.removeEventListener('hardwareBackPress', () => {
             // this.onMainScreen and this.goBack are just examples, you need to use your own implementation here
             // Typically you would use the navigator here to go to the last state.
 
@@ -102,7 +106,7 @@ class Questions extends Component {
         if (this.state.index === 28) {
             let min = this.state.min.toString().length < 2 ? `0${this.state.min}` : `:${this.state.min}`;
             let sec = this.state.sec.toString().length < 2 ? `0${this.state.sec}` : `:${this.state.sec}`;
-            BackgroundTimer.clearInterval(this.clearTimer);
+            BackgroundTimer.clearInterval(clearTimer);
             this.reset('Result');
 
             this.props.result({ score: this.state.score, time: `${min}${sec}`, attempt: this.state.attemptCounter });
@@ -181,7 +185,9 @@ class Questions extends Component {
     }
 
     hideAlert = () => {
+        clearTimer = BackgroundTimer.setInterval(this.updataTimerSeconds, 1000);
         this.setState({ showAlert: false });
+        this.backButtonFunction();
     }
     hideAlertWithAction = () => {
         let obj = {
@@ -200,11 +206,11 @@ class Questions extends Component {
             attemptCounter: 0,
             showAlert: false
         }
-        BackgroundTimer.clearInterval(this.clearTimer);
+        BackgroundTimer.clearInterval(clearTimer);
         this.question = [];
-        this.clearTimer = {};
+        clearTimer = {};
         this.setState(obj);
-        this.props.navigation.goback();
+        console.log(this.props.navigation.goBack());
     }
 
     render() {
@@ -219,10 +225,10 @@ class Questions extends Component {
             return (
                 <View style={styles.container}>
                     <AwesomeAlert
-                        show={showAlert}
+                        show={this.state.showAlert}
                         showProgress={false}
                         title="Quiz"
-                        message="Exit Quiz ?"
+                        message="Want to Exit Quiz ?"
                         closeOnTouchOutside={false}
                         closeOnHardwareBackPress={true}
                         showCancelButton={true}
@@ -242,6 +248,7 @@ class Questions extends Component {
             )
         }
         return (
+
             <View style={[styles.container]}>
                 <StatusBar
                     hidden={true} />
@@ -252,7 +259,7 @@ class Questions extends Component {
                                 show={showAlert}
                                 showProgress={false}
                                 title="Quiz"
-                                message="Exit Quiz ?"
+                                message="Want to Exit Quiz ?"
                                 closeOnTouchOutside={false}
                                 closeOnHardwareBackPress={true}
                                 showCancelButton={true}
@@ -271,6 +278,7 @@ class Questions extends Component {
                         :
                         null
                 }
+
                 <View style={styles.screenWrapper}>
                     <View style={styles.heading}>
                         <View style={{ flex: 1.5 }}>
